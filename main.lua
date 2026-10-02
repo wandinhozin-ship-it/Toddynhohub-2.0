@@ -1,21 +1,12 @@
 --[[
     ============================================================
-    MEU SCRIPT - MM2 Style
+    TODDYNHO 2.0 - MM2 Style
     Tema: Dark Roxo 🟣
-    Autor: wandinhozin-ship-it
-    ============================================================
-    Funções:
-    - Combat: Kill All, Kill Selected, Auto Kill All, Auto Grab Gun
-    - Sheriff: Auto Shoot, Magic Bullet, Prediction Beam
-    - LocalPlayer: Anti-Fling, Void Hide
-    - Modifiers: WalkSpeed, JumpPower, FOV
-    - Visuals: Aura, Kill Effect
-    - ESP por role (Murderer/Sheriff/Innocent/Hero)
     ============================================================
 ]]
 
-if _G.MeuScriptLoaded then return end
-_G.MeuScriptLoaded = true
+if _G.ToddynhoLoaded then return end
+_G.ToddynhoLoaded = true
 
 -- ============================================================
 -- SERVIÇOS
@@ -71,26 +62,34 @@ end
 -- ROOT GUI
 -- ============================================================
 local ScreenGui = new("ScreenGui", {
-    Name = "MeuScriptUI",
+    Name = "ToddynhoUI",
     ResetOnSpawn = false,
     ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
     Parent = (gethui and gethui()) or game:GetService("CoreGui"),
 })
 
 -- ============================================================
--- JANELA
+-- JANELA (tamanho responsivo pro celular)
 -- ============================================================
 local Window = {}
 Window.Tabs = {}
 Window.ActiveTab = nil
 
+local viewport = workspace.CurrentCamera.ViewportSize
+local isSmall = viewport.X < 700
+
+local winW = isSmall and math.min(viewport.X - 30, 500) or 580
+local winH = isSmall and math.min(viewport.Y - 80, 380) or 400
+local tabW = isSmall and 95 or 130
+
 local MainFrame = new("Frame", {
     Name = "MainFrame",
-    Size = UDim2.fromOffset(580, 400),
-    Position = UDim2.new(0.5, -290, 0.5, -200),
+    Size = UDim2.fromOffset(winW, winH),
+    Position = UDim2.new(0.5, -winW / 2, 0.5, -winH / 2),
     BackgroundColor3 = Theme.BG,
     BorderSizePixel = 0,
     Active = true,
+    ClipsDescendants = true,
     Parent = ScreenGui,
 })
 corner(MainFrame, 12)
@@ -109,7 +108,7 @@ new("TextLabel", {
     Size = UDim2.new(1, -80, 1, 0),
     Position = UDim2.fromOffset(14, 0),
     BackgroundTransparency = 1,
-    Text = "🟣 Meu Script",
+    Text = "🟣 Toddynho 2.0",
     TextColor3 = Theme.Text,
     TextSize = 15,
     Font = Enum.Font.GothamBold,
@@ -129,9 +128,6 @@ local CloseBtn = new("TextButton", {
     Parent = TitleBar,
 })
 corner(CloseBtn, 6)
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui.Enabled = false
-end)
 
 local MinBtn = new("TextButton", {
     Size = UDim2.fromOffset(28, 28),
@@ -148,12 +144,12 @@ corner(MinBtn, 6)
 local minimized = false
 MinBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
-    MainFrame.Size = minimized and UDim2.fromOffset(580, 36) or UDim2.fromOffset(580, 400)
+    MainFrame.Size = minimized and UDim2.fromOffset(winW, 36) or UDim2.fromOffset(winW, winH)
 end)
 
 local TabBar = new("Frame", {
     Name = "TabBar",
-    Size = UDim2.new(0, 130, 1, -46),
+    Size = UDim2.new(0, tabW, 1, -46),
     Position = UDim2.fromOffset(6, 42),
     BackgroundColor3 = Theme.Surface,
     BorderSizePixel = 0,
@@ -175,8 +171,8 @@ new("UIPadding", {
 
 local Content = new("Frame", {
     Name = "Content",
-    Size = UDim2.new(1, -142, 1, -52),
-    Position = UDim2.fromOffset(140, 46),
+    Size = UDim2.new(1, -(tabW + 12), 1, -52),
+    Position = UDim2.fromOffset(tabW + 6, 46),
     BackgroundTransparency = 1,
     ClipsDescendants = true,
     Parent = MainFrame,
@@ -655,10 +651,11 @@ function Window:AddDropdown(tab, opts)
                 TextSize = 12,
                 Font = Enum.Font.Gotham,
                 BorderSizePixel = 0,
-                     })
+                Parent = list,
+            })
             corner(ob, 6)
             ob.MouseButton1Click:Connect(function()
-                valueLabel.Text = tostring(opt)
+                valueLabel.                valueLabel.Text = tostring(opt)
                 expanded = false
                 holder.Size = UDim2.new(1, 0, 0, 44)
                 list.Size = UDim2.new(1, 0, 0, 0)
@@ -1284,8 +1281,8 @@ local function setupAntiFling(char)
         if antiFlingOn and part:IsA("BasePart") then
             pcall(function() part.CanCollide = false end)
         end
-  end
-      for _, part in ipairs(char:GetChildren()) do
+    end
+    for _, part in ipairs(char:GetChildren()) do
         disableCollide(part)
     end
     local c1 = char.ChildAdded:Connect(disableCollide)
@@ -1925,9 +1922,9 @@ Window:AddToggle(VisualTab, {
 })
 
 Window:AddColorPicker(VisualTab, {
-    Title = "Kill Effect Color",    Description = "Cor do efeito de kill",
-    Default = Color3.fromRGB(160, 80, 255),
-    Callback = function(c) killEffectColor = c end,
+    Title = "Kill Effect Color",
+    Description = "Cor do efeito de kill",
+    Default = Color3.fromRGB(160, 80, 255)    Callback = function(c) killEffectColor = c end,
 })
 
 Players.PlayerAdded:Connect(function(plr)
@@ -2270,7 +2267,42 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- ============================================================
+-- BOTÃO FLUTUANTE ABRIR/FECHAR MENU
+-- ============================================================
+local ToggleBtn = new("TextButton", {
+    Name = "MenuToggle",
+    Size = UDim2.fromOffset(56, 56),
+    Position = UDim2.new(0, 15, 0.5, -28),
+    BackgroundColor3 = Theme.Accent,
+    Text = "🟣",
+    TextSize = 26,
+    Font = Enum.Font.GothamBold,
+    TextColor3 = Theme.Text,
+    BorderSizePixel = 0,
+    AutoButtonColor = false,
+    Parent = ScreenGui,
+})
+corner(ToggleBtn, 28)
+stroke(ToggleBtn, Theme.Text, 2)
+
+local menuOpen = true
+
+local function setMenuOpen(v)
+    menuOpen = v
+    MainFrame.Visible = v
+    ToggleBtn.BackgroundColor3 = v and Theme.Accent or Theme.Surface2
+end
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    setMenuOpen(not menuOpen)
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    setMenuOpen(false)
+end)
+
+-- ============================================================
 -- MENSAGEM FINAL
 -- ============================================================
 task.wait(0.5)
-Window:Notify("Script carregado", "Todas as funções prontas 🟣", 4)
+Window:Notify("Toddynho 2.0", "Script carregado 🟣", 4)
