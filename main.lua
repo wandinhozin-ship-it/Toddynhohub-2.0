@@ -69,7 +69,7 @@ local ScreenGui = new("ScreenGui", {
 })
 
 -- ============================================================
--- JANELA (tamanho responsivo pro celular)
+-- JANELA (responsiva pro celular)
 -- ============================================================
 local Window = {}
 Window.Tabs = {}
@@ -178,7 +178,7 @@ local Content = new("Frame", {
     Parent = MainFrame,
 })
 
--- Drag
+-- Drag da janela
 do
     local dragging, dragStart, startPos
     TitleBar.InputBegan:Connect(function(input)
@@ -461,7 +461,6 @@ function Window:AddButton(tab, opts)
         pcall(callback)
     end)
 end
-
 -- ============================================================
 -- ADD SLIDER
 -- ============================================================
@@ -655,7 +654,7 @@ function Window:AddDropdown(tab, opts)
             })
             corner(ob, 6)
             ob.MouseButton1Click:Connect(function()
-                valueLabel.                valueLabel.Text = tostring(opt)
+                valueLabel.Text = tostring(opt)
                 expanded = false
                 holder.Size = UDim2.new(1, 0, 0, 44)
                 list.Size = UDim2.new(1, 0, 0, 0)
@@ -848,8 +847,7 @@ local function stabPlayer(target)
         events.HandleTouched:FireServer(head)
     end)
     return ok
-end
-
+    end
 -- ============================================================
 -- COMBAT - MURDER FUNCTIONS
 -- ============================================================
@@ -1266,7 +1264,6 @@ Window:AddToggle(CombatTab, {
         end
     end,
 })
-
 -- ============================================================
 -- LOCALPLAYER - ANTI-FLING
 -- ============================================================
@@ -1680,7 +1677,6 @@ LP.CharacterAdded:Connect(function()
     if jpEnabled then applyJumpPower() end
     if fovEnabled then applyFOV() end
 end)
-
 -- ============================================================
 -- VISUALS - AURA
 -- ============================================================
@@ -1924,7 +1920,8 @@ Window:AddToggle(VisualTab, {
 Window:AddColorPicker(VisualTab, {
     Title = "Kill Effect Color",
     Description = "Cor do efeito de kill",
-    Default = Color3.fromRGB(160, 80, 255)    Callback = function(c) killEffectColor = c end,
+    Default = Color3.fromRGB(160, 80, 255),
+    Callback = function(c) killEffectColor = c end,
 })
 
 Players.PlayerAdded:Connect(function(plr)
